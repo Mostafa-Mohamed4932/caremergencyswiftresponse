@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:uuid/uuid.dart'; // Import the UUID package
-import 'login.dart'; // Import the Login page
+import 'login.dart'; // Import the login page
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -185,20 +184,26 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // Function to register user, generate unique ID, and save to Firestore
+  // Function to register user, check for existing IDs, generate new ID, and save to Firestore
   Future<void> _registerUser() async {
     final name = _nameController.text;
     final email = _emailController.text;
     final password = _passwordController.text;
 
-    // Generate a unique ID using UUID
-    var uuid = Uuid();
-    String uniqueId = uuid.v4(); // Generates a unique ID
-
-    // Save user data to Firestore
     try {
+      // Query existing IDs
+      QuerySnapshot snapshot = await users.orderBy('ID', descending: true).limit(1).get();
+
+      int nextId = 1; // Default ID in case the collection is empty
+      if (snapshot.docs.isNotEmpty) {
+        // Get the highest existing ID
+        var highestID = snapshot.docs.first['ID'];
+        nextId = highestID + 1;
+      }
+
+      // Save user data to Firestore with the new unique ID
       await users.add({
-        'Id': uniqueId,  // Add the generated ID
+        'ID': nextId,
         'Name': name,
         'Email': email,
         'Password': password,  // Note: Storing plain-text password is not recommended. Use proper authentication and hashing.
@@ -206,20 +211,21 @@ class _RegisterPageState extends State<RegisterPage> {
 
       // Show a success message
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('User Registered Successfully!'),
+        content: Text('User Registered Successfully! Your ID: $nextId'),
       ));
-
-      // Navigate to Login Page
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()), // Replace with LoginPage
-      );
 
       // Clear form fields
       _nameController.clear();
       _emailController.clear();
       _passwordController.clear();
       _confirmPasswordController.clear();
+
+      // Navigate to the login page after successful registration
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),  // Navigate to "login.dart"
+      );
+
     } catch (e) {
       print('Error adding user: $e');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
