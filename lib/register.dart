@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uuid/uuid.dart'; // Import the UUID package
+import 'login.dart'; // Import the Login page
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -183,15 +185,20 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // Function to register user and save to Firestore
+  // Function to register user, generate unique ID, and save to Firestore
   Future<void> _registerUser() async {
     final name = _nameController.text;
     final email = _emailController.text;
     final password = _passwordController.text;
 
+    // Generate a unique ID using UUID
+    var uuid = Uuid();
+    String uniqueId = uuid.v4(); // Generates a unique ID
+
     // Save user data to Firestore
     try {
       await users.add({
+        'Id': uniqueId,  // Add the generated ID
         'Name': name,
         'Email': email,
         'Password': password,  // Note: Storing plain-text password is not recommended. Use proper authentication and hashing.
@@ -201,6 +208,12 @@ class _RegisterPageState extends State<RegisterPage> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('User Registered Successfully!'),
       ));
+
+      // Navigate to Login Page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()), // Replace with LoginPage
+      );
 
       // Clear form fields
       _nameController.clear();
