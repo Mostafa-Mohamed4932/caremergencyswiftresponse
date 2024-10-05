@@ -184,24 +184,36 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // Function to register user, check for existing IDs, generate new ID, and save to Firestore
+  // Function to register user, check for existing emails, assign missing ID, and save to Firestore
   Future<void> _registerUser() async {
     final name = _nameController.text;
     final email = _emailController.text;
     final password = _passwordController.text;
 
     try {
-      // Query existing IDs
-      QuerySnapshot snapshot = await users.orderBy('ID', descending: true).limit(1).get();
-
-      int nextId = 1; // Default ID in case the collection is empty
-      if (snapshot.docs.isNotEmpty) {
-        // Get the highest existing ID
-        var highestID = snapshot.docs.first['ID'];
-        nextId = highestID + 1;
+      // Step 1: Check if the email is already in use
+      QuerySnapshot existingEmailSnapshot = await users.where('Email', isEqualTo: email).get();
+      if (existingEmailSnapshot.docs.isNotEmpty) {
+        // Email already exists, show an error message
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('This email is already in use. Please use a different email.'),
+        ));
+        return;
       }
 
-      // Save user data to Firestore with the new unique ID
+      // Step 2: Fetch all IDs to find missing ID
+      QuerySnapshot snapshot = await users.orderBy('ID').get();  // Removed 'ascending: true'
+      int nextId = 1;  // Start with 1
+      for (var doc in snapshot.docs) {
+        if (doc['ID'] == nextId) {
+          nextId++;  // Increment ID if it's taken
+        } else {
+          break;  // We found a missing ID, use this one
+        }
+      }
+
+
+      // Step 3: Save user data to Firestore with the available unique ID
       await users.add({
         'ID': nextId,
         'Name': name,
@@ -209,7 +221,7 @@ class _RegisterPageState extends State<RegisterPage> {
         'Password': password,  // Note: Storing plain-text password is not recommended. Use proper authentication and hashing.
       });
 
-      // Show a success message
+      // Step 4: Show a success message and navigate to login page
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('User Registered Successfully! Your ID: $nextId'),
       ));
