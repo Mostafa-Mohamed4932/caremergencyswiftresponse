@@ -17,8 +17,8 @@ void sendEmail() async {
 
   // Create email message
   final message = Message()
-    ..from = Address('youremail@example.com', 'CareEmergency Swift Response') // Replace with your verified email
-    ..recipients.add('recipient@example.com') // Replace with recipient's email
+    ..from = Address('youremail@example.com', 'CareEmergency Swift Response')
+    ..recipients.add('recipient@example.com')
     ..subject = 'Test Email from CareEmergency Swift Response App'
     ..text = 'This is a test email sent from the CareEmergency Swift Response App using SendGrid SMTP!';
 
