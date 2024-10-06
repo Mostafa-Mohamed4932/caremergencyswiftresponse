@@ -44,26 +44,26 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> with SingleTi
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80), // Adjust the height as needed
+        preferredSize: Size.fromHeight(70), // Adjust the height as needed
         child: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           automaticallyImplyLeading: false, // Removes the back arrow
           flexibleSpace: Container(
             width: double.infinity, // Full width
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            padding: EdgeInsets.symmetric(horizontal: 16), // Horizontal padding
             color: Colors.grey.shade200, // Light gray background
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center, // Ensure vertical centering
+              mainAxisAlignment: MainAxisAlignment.spaceBetween, // Keep items on the same line
+              crossAxisAlignment: CrossAxisAlignment.center, // Vertically align to center
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
-                    children: [
-                      Text('Welcome back,', style: TextStyle(fontSize: 16, color: Colors.black54)),
-                      Text('Linda Myers', style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Welcome back,', style: TextStyle(fontSize: 16, color: Colors.black54)),
+                    Text('Linda Myers', style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
+                  ],
                 ),
                 CircleAvatar(
                   backgroundImage: NetworkImage('https://example.com/profile_picture.png'), // Replace with a valid image or fallback to guest icon
