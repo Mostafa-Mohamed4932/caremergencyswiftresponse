@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ContactListPage extends StatefulWidget {
   @override
@@ -8,28 +9,57 @@ class ContactListPage extends StatefulWidget {
 }
 
 class _ContactListPageState extends State<ContactListPage> {
-  List<Contact> _contacts = [];
+  List<Contact> contacts = [];
 
   @override
   void initState() {
     super.initState();
-    _getContacts();
+    _requestContactPermission();
   }
 
-  // Request permission and get contacts
-  Future<void> _getContacts() async {
-    PermissionStatus permission = await Permission.contacts.request();
+  // Request contact permission
+  Future<void> _requestContactPermission() async {
+    var status = await Permission.contacts.status;
+    if (status.isGranted) {
+      _fetchContacts();
+    } else if (status.isDenied || status.isPermanentlyDenied) {
+      // Ask for permission if not granted
+      if (await Permission.contacts.request().isGranted) {
+        _fetchContacts();
+      } else {
+        // Handle if the permission is denied permanently
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Contact permission denied'),
+          ),
+        );
+      }
+    }
+  }
 
-    if (permission.isGranted) {
-      Iterable<Contact> contacts = await ContactsService.getContacts();
+  // Fetch contacts from the user's phone
+  Future<void> _fetchContacts() async {
+    try {
+      Iterable<Contact> contactsFromPhone = await ContactsService.getContacts();
       setState(() {
-        _contacts = contacts.toList();
+        contacts = contactsFromPhone.toList();
       });
+    } catch (e) {
+      print("Error fetching contacts: $e");
+    }
+  }
+
+  // Function to make a phone call
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final Uri callUri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(callUri)) {
+      await launchUrl(callUri);
     } else {
-      // If permission is denied, you can show a message to the user.
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Permission denied to access contacts'),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not launch dialer'),
+        ),
+      );
     }
   }
 
@@ -39,39 +69,35 @@ class _ContactListPageState extends State<ContactListPage> {
       appBar: AppBar(
         title: Text('Contacts'),
       ),
-      body: _contacts.isEmpty
+      body: contacts.isEmpty
           ? Center(child: CircularProgressIndicator())
           : ListView.builder(
-        itemCount: _contacts.length,
+        itemCount: contacts.length,
         itemBuilder: (context, index) {
-          Contact contact = _contacts[index];
+          Contact contact = contacts[index];
           return ListTile(
             leading: (contact.avatar != null && contact.avatar!.isNotEmpty)
-                ? CircleAvatar(
-              backgroundImage: MemoryImage(contact.avatar!),
-            )
-                : CircleAvatar(
-              child: Text(contact.initials()),
-            ),
-            title: Text(contact.displayName ?? ''),
-            subtitle: Text(
-              contact.phones!.isNotEmpty
-                  ? contact.phones!.first.value ?? ''
-                  : 'No phone number',
-            ),
-            trailing: Icon(Icons.more_vert),
+                ? CircleAvatar(backgroundImage: MemoryImage(contact.avatar!))
+                : CircleAvatar(child: Text(contact.initials())),
+            title: Text(contact.displayName ?? 'No Name'),
+            subtitle: contact.phones!.isNotEmpty
+                ? Text(contact.phones!.first.value ?? '')
+                : Text('No Phone Number'),
             onTap: () {
-              // Add functionality for when a contact is tapped
+              // If the contact has a phone number, initiate a call
+              if (contact.phones!.isNotEmpty) {
+                String phoneNumber = contact.phones!.first.value!;
+                _makePhoneCall(phoneNumber);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('No phone number available'),
+                  ),
+                );
+              }
             },
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add new contact functionality
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.red, // Set the color of the button to red
       ),
     );
   }
