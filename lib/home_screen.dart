@@ -46,22 +46,23 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> with SingleTi
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        automaticallyImplyLeading: false, // Removes the back arrow
         title: Container(
+          width: double.infinity, // Full width background
           padding: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade200, // Light grayish background
-            borderRadius: BorderRadius.circular(12), // Smooth rounded edges
-          ),
+          color: Colors.grey.shade200, // Light gray background
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center, // Ensure vertical centering
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Welcome back,', style: TextStyle(fontSize: 16, color: Colors.black54)),
-                  Text('Linda Myers', style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+                  children: [
+                    Text('Welcome back,', style: TextStyle(fontSize: 16, color: Colors.black54)),
+                    Text('Linda Myers', style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
+                  ],
+                ),
               ),
-              Spacer(),
               CircleAvatar(
                 backgroundImage: NetworkImage('https://example.com/profile_picture.png'), // Replace with a valid image or fallback to guest icon
                 onBackgroundImageError: (_, __) {
