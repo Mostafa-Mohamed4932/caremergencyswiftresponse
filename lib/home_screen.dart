@@ -46,26 +46,32 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> with SingleTi
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Align(
-          alignment: Alignment.topLeft,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        title: Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade200, // Light grayish background
+            borderRadius: BorderRadius.circular(12), // Smooth rounded edges
+          ),
+          child: Row(
             children: [
-              Text('Welcome back,', style: TextStyle(fontSize: 16, color: Colors.black54)),
-              Text('Linda Myers', style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Welcome back,', style: TextStyle(fontSize: 16, color: Colors.black54)),
+                  Text('Linda Myers', style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              Spacer(),
+              CircleAvatar(
+                backgroundImage: NetworkImage('https://example.com/profile_picture.png'), // Replace with a valid image or fallback to guest icon
+                onBackgroundImageError: (_, __) {
+                  setState(() {});
+                },
+                child: Icon(Icons.person, color: Colors.grey), // Guest icon if no image
+              ),
             ],
           ),
         ),
-        actions: [
-          CircleAvatar(
-            backgroundImage: NetworkImage('https://example.com/profile_picture.png'), // Replace with a valid image or fallback to guest icon
-            onBackgroundImageError: (_, __) {
-              setState(() {});
-            },
-            child: Icon(Icons.person, color: Colors.grey), // Guest icon
-          ),
-          SizedBox(width: 16),
-        ],
       ),
       body: Center(
         child: Column(
