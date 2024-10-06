@@ -156,7 +156,7 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> with SingleTi
   }
 }
 
-// In your CustomBottomNavBar (from main.dart):
+// CustomBottomNavBar (from main.dart):
 class CustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onItemTapped;
@@ -186,17 +186,23 @@ class CustomBottomNavBar extends StatelessWidget {
       icon: Column(
         children: [
           Container(
-            width: 50, // Adjusted width for the red square box
-            height: 50,
+            width: 50, // Adjusted width
+            height: 60, // Adjusted height to accommodate text
             decoration: BoxDecoration(
               color: isSelected ? Colors.red : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: isSelected ? Colors.white : Colors.grey),
-          ),
-          Text(
-            label,
-            style: TextStyle(color: isSelected ? Colors.white : Colors.grey),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, color: isSelected ? Colors.white : Colors.grey),
+                if (isSelected)
+                  Text(
+                    label,
+                    style: TextStyle(color: Colors.white), // Text inside the red box when selected
+                  ),
+              ],
+            ),
           ),
         ],
       ),
