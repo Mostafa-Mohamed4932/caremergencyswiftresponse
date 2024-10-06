@@ -71,10 +71,10 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> {
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
                         colors: [
-                          Colors.red.shade900, // Darker red color
-                          Colors.red.shade700, // Slightly lighter red for gradient effect
+                          Colors.red.shade800, // Slightly lighter than before
+                          Colors.red.shade500, // Even lighter red
                         ],
-                        stops: [0.5, 1.0], // Adjust for a smooth gradient effect
+                        stops: [0.6, 1.0], // Adjust for a smooth gradient effect
                       ),
                     ),
                   ),
