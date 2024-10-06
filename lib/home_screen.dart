@@ -138,41 +138,51 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> with SingleTi
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: _buildNavBarIcon(Icons.home),
-            label: 'Home',
+            icon: _buildNavBarItem(Icons.home, "Home", _selectedIndex == 0),
+            label: '',
           ),
           BottomNavigationBarItem(
-            icon: _buildNavBarIcon(Icons.contacts),
-            label: 'Contacts',
+            icon: _buildNavBarItem(Icons.contacts, "Contacts", _selectedIndex == 1),
+            label: '',
           ),
           BottomNavigationBarItem(
-            icon: _buildNavBarIcon(Icons.medical_services),
-            label: 'Medical History',
+            icon: _buildNavBarItem(Icons.medical_services, "Medical", _selectedIndex == 2),
+            label: '',
           ),
           BottomNavigationBarItem(
-            icon: _buildNavBarIcon(Icons.settings),
-            label: 'Settings',
+            icon: _buildNavBarItem(Icons.settings, "Settings", _selectedIndex == 3),
+            label: '',
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.white, // Icons and text in white when selected
-        unselectedItemColor: Colors.white, // Icons and text in white when unselected
         onTap: _onItemTapped,
         backgroundColor: Colors.transparent, // Keep background transparent
       ),
     );
   }
 
-  // Function to create the icon with a red square background
-  Widget _buildNavBarIcon(IconData icon) {
+  // Function to create the icon with text next to it and a red square background
+  Widget _buildNavBarItem(IconData icon, String label, bool isSelected) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.red, // Red square background
+        color: isSelected ? Colors.red : Colors.transparent, // Red when selected, transparent when not
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.circular(8), // Rounded corners
       ),
-      padding: EdgeInsets.all(8), // Padding to give space inside the square
-      child: Icon(icon, color: Colors.white), // White icon
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Padding to make the box larger
+      child: Row(
+        children: [
+          Icon(icon, color: isSelected ? Colors.white : Colors.grey), // White icon when selected
+          if (isSelected) // Show label only when the item is selected
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: Text(
+                label,
+                style: TextStyle(color: Colors.white), // White text
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
