@@ -43,34 +43,37 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> with SingleTi
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        automaticallyImplyLeading: false, // Removes the back arrow
-        title: Container(
-          width: double.infinity, // Full width background
-          padding: EdgeInsets.all(16),
-          color: Colors.grey.shade200, // Light gray background
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center, // Ensure vertical centering
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
-                  children: [
-                    Text('Welcome back,', style: TextStyle(fontSize: 16, color: Colors.black54)),
-                    Text('Linda Myers', style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
-                  ],
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80), // Adjust the height as needed
+        child: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          automaticallyImplyLeading: false, // Removes the back arrow
+          flexibleSpace: Container(
+            width: double.infinity, // Full width
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            color: Colors.grey.shade200, // Light gray background
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center, // Ensure vertical centering
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+                    children: [
+                      Text('Welcome back,', style: TextStyle(fontSize: 16, color: Colors.black54)),
+                      Text('Linda Myers', style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
                 ),
-              ),
-              CircleAvatar(
-                backgroundImage: NetworkImage('https://example.com/profile_picture.png'), // Replace with a valid image or fallback to guest icon
-                onBackgroundImageError: (_, __) {
-                  setState(() {});
-                },
-                child: Icon(Icons.person, color: Colors.grey), // Guest icon if no image
-              ),
-            ],
+                CircleAvatar(
+                  backgroundImage: NetworkImage('https://example.com/profile_picture.png'), // Replace with a valid image or fallback to guest icon
+                  onBackgroundImageError: (_, __) {
+                    setState(() {});
+                  },
+                  child: Icon(Icons.person, color: Colors.grey), // Guest icon if no image
+                ),
+              ],
+            ),
           ),
         ),
       ),
