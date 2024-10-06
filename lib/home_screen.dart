@@ -27,17 +27,15 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Welcome back,', style: TextStyle(fontSize: 16, color: Colors.black54)),
-              Text('Linda Myers', style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)), // Updated color to black
+              Text('Linda Myers', style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
         actions: [
           CircleAvatar(
-            backgroundImage: NetworkImage('https://example.com/profile_picture.png'), // Replace with a valid image or leave empty for default
-            onBackgroundImageError: (_, __) { // Use this to handle fallback to guest icon
-              setState(() {
-                // Show guest icon if no valid image
-              });
+            backgroundImage: NetworkImage('https://example.com/profile_picture.png'), // Replace with a valid image or fallback to guest icon
+            onBackgroundImageError: (_, __) {
+              setState(() {});
             },
             child: Icon(Icons.person, color: Colors.grey), // Guest icon
           ),
@@ -72,7 +70,11 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
-                        colors: [Colors.red.withOpacity(0.8), Colors.red.withOpacity(0.5)],
+                        colors: [
+                          Colors.red.shade900, // Darker red color
+                          Colors.red.shade700, // Slightly lighter red for gradient effect
+                        ],
+                        stops: [0.5, 1.0], // Adjust for a smooth gradient effect
                       ),
                     ),
                   ),
@@ -104,7 +106,7 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.red, // Red when selected
-        unselectedItemColor: Colors.grey, // Ensure the icons stay gray when unselected
+        unselectedItemColor: Colors.grey, // Gray when unselected
         onTap: _onItemTapped,
       ),
     );
