@@ -136,29 +136,43 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> with SingleTi
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.grey), // Gray icon
+            icon: _buildNavBarIcon(Icons.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.contacts, color: Colors.grey), // Gray icon
+            icon: _buildNavBarIcon(Icons.contacts),
             label: 'Contacts',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.medical_services, color: Colors.grey), // Gray icon
+            icon: _buildNavBarIcon(Icons.medical_services),
             label: 'Medical History',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings, color: Colors.grey), // Gray icon
+            icon: _buildNavBarIcon(Icons.settings),
             label: 'Settings',
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.red, // Red when selected
-        unselectedItemColor: Colors.grey, // Gray when unselected
+        selectedItemColor: Colors.white, // Icons and text in white when selected
+        unselectedItemColor: Colors.white, // Icons and text in white when unselected
         onTap: _onItemTapped,
+        backgroundColor: Colors.transparent, // Keep background transparent
       ),
+    );
+  }
+
+  // Function to create the icon with a red square background
+  Widget _buildNavBarIcon(IconData icon) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.red, // Red square background
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.circular(8), // Rounded corners
+      ),
+      padding: EdgeInsets.all(8), // Padding to give space inside the square
+      child: Icon(icon, color: Colors.white), // White icon
     );
   }
 }
