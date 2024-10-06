@@ -37,28 +37,42 @@ class CustomBottomNavBar extends StatefulWidget {
 class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      items: <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: _buildNavBarItem(Icons.home, "Home", widget.selectedIndex == 0),
-          label: '',
-        ),
-        BottomNavigationBarItem(
-          icon: _buildNavBarItem(Icons.contacts, "Contacts", widget.selectedIndex == 1),
-          label: '',
-        ),
-        BottomNavigationBarItem(
-          icon: _buildNavBarItem(Icons.medical_services, "Medical", widget.selectedIndex == 2),
-          label: '',
-        ),
-        BottomNavigationBarItem(
-          icon: _buildNavBarItem(Icons.settings, "Settings", widget.selectedIndex == 3),
-          label: '',
-        ),
-      ],
-      currentIndex: widget.selectedIndex,
-      onTap: widget.onItemTapped,
-      backgroundColor: Colors.transparent,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade300, // Add a contrasting color for the nav bar background
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10,
+            spreadRadius: 2,
+            offset: Offset(0, -2), // Shadow above the bottom nav bar
+          ),
+        ],
+      ),
+      child: BottomNavigationBar(
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: _buildNavBarItem(Icons.home, "Home", widget.selectedIndex == 0),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: _buildNavBarItem(Icons.contacts, "Contacts", widget.selectedIndex == 1),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: _buildNavBarItem(Icons.medical_services, "Medical", widget.selectedIndex == 2),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: _buildNavBarItem(Icons.settings, "Settings", widget.selectedIndex == 3),
+            label: '',
+          ),
+        ],
+        currentIndex: widget.selectedIndex,
+        onTap: widget.onItemTapped,
+        backgroundColor: Colors.transparent, // Transparent to allow container's color to show
+        elevation: 0, // Remove default shadow
+      ),
     );
   }
 
@@ -70,17 +84,16 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
         borderRadius: BorderRadius.circular(8),
       ),
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Row(
+      child: Column(
         children: [
           Icon(icon, color: isSelected ? Colors.white : Colors.grey),
-          if (isSelected)
-            Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: Text(
-                label,
-                style: TextStyle(color: Colors.white),
-              ),
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              label,
+              style: TextStyle(color: isSelected ? Colors.white : Colors.grey),
             ),
+          ),
         ],
       ),
     );
