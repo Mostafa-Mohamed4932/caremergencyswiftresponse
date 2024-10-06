@@ -172,7 +172,7 @@ class CustomBottomNavBar extends StatelessWidget {
       items: <BottomNavigationBarItem>[
         _buildNavBarItem(Icons.home, "Home", selectedIndex == 0),
         _buildNavBarItem(Icons.contacts, "Contacts", selectedIndex == 1),
-        _buildNavBarItem(Icons.medical_services, "Medical", selectedIndex == 2),
+        _buildNavBarItem(Icons.medical_services, "Medical History", selectedIndex == 2),
         _buildNavBarItem(Icons.settings, "Settings", selectedIndex == 3),
       ],
       currentIndex: selectedIndex,
@@ -186,8 +186,8 @@ class CustomBottomNavBar extends StatelessWidget {
       icon: Column(
         children: [
           Container(
-            width: 50, // Adjusted width
-            height: 60, // Adjusted height to accommodate text
+            width: 100, // Double the width for more text visibility
+            height: 60, // Adjusted height to fit icon and text
             decoration: BoxDecoration(
               color: isSelected ? Colors.red : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
@@ -199,7 +199,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 if (isSelected)
                   Text(
                     label,
-                    style: TextStyle(color: Colors.white), // Text inside the red box when selected
+                    style: TextStyle(color: Colors.white), // Text inside red box when selected
                   ),
               ],
             ),
