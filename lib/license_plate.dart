@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart'; // For text recognition
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http; // Import HTTP package
+import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'dart:convert';
 
 void main() {
   runApp(const MyApp());
@@ -37,6 +37,8 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
   File? _image;
   String _recognizedText = 'No text recognized yet';
   bool _isProcessing = false;
+  final String _apiKey = 'K85860302188957'; // Your OCR Space API key
+  final TextEditingController _urlController = TextEditingController();
 
   // Pick image from camera or gallery
   Future<void> _pickImage(ImageSource source) async {
@@ -61,19 +63,16 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
   // Load image from network URL
   Future<void> _loadNetworkImage(String url) async {
     try {
-      // Fetch image from network
       final response = await http.get(Uri.parse(url));
 
-      // Check if the request is successful
       if (response.statusCode == 200) {
         final tempDir = await getTemporaryDirectory();
         final tempFile = File('${tempDir.path}/network_image.jpg');
 
-        // Write the image bytes to a file
         await tempFile.writeAsBytes(response.bodyBytes);
 
         setState(() {
-          _image = tempFile;
+          _image = tempFile; // Update the image
           _isProcessing = true; // Start processing
         });
 
@@ -91,20 +90,52 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
     }
   }
 
-  // Perform text recognition using Google ML Kit
+  // Perform text recognition using OCR Space API
   Future<void> _recognizeText(File imageFile) async {
-    final inputImage = InputImage.fromFile(imageFile);
-    final textRecognizer = TextRecognizer();
-
     try {
-      final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+      final url = Uri.parse('https://api.ocr.space/parse/image');
 
-      setState(() {
-        _recognizedText = recognizedText.text.isNotEmpty
-            ? recognizedText.text
-            : 'No text recognized in the image';
-        _isProcessing = false; // Stop processing
-      });
+      // Convert the image file to base64 string
+      String base64Image = base64Encode(await imageFile.readAsBytes());
+
+      // Make the API request
+      var response = await http.post(
+        url,
+        headers: {
+          'apikey': _apiKey,
+        },
+        body: {
+          'base64Image': 'data:image/jpeg;base64,$base64Image',
+          'language': 'ara', // Specify Arabic for text recognition
+        },
+      );
+
+      // Handle the response
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['ParsedResults'] != null && jsonResponse['ParsedResults'].isNotEmpty) {
+          var extractedText = jsonResponse['ParsedResults'][0]['ParsedText'];
+          setState(() {
+            _recognizedText = extractedText.isNotEmpty
+                ? extractedText
+                : 'No text recognized in the image';
+            _isProcessing = false; // Stop processing
+          });
+        } else {
+          setState(() {
+            _recognizedText = 'No text recognized in the image';
+            _isProcessing = false; // Stop processing
+          });
+        }
+      } else {
+        setState(() {
+          _recognizedText = 'Error: ${response.reasonPhrase}';
+          _isProcessing = false; // Stop processing
+        });
+        if (kDebugMode) {
+          print('Request failed with status: ${response.statusCode}. Response: ${response.body}');
+        }
+      }
     } catch (e) {
       setState(() {
         _recognizedText = 'Error recognizing text: $e';
@@ -113,14 +144,8 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
       if (kDebugMode) {
         print('Error during text recognition: $e');
       }
-    } finally {
-      textRecognizer.close();
     }
   }
-
-  // Sample network image URL with Arabic text
-  final String _arabicImageUrl =
-      'https://upload.wikimedia.org/wikipedia/commons/d/d1/Egypt_-_License_Plate_-_Private_Giza.png';
 
   @override
   Widget build(BuildContext context) {
@@ -143,10 +168,24 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
                     Icons.add_a_photo,
                     size: 60,
                   )
-                      : Image.file(_image!),
+                      : Image.file(_image!), // Display the selected image
                 ),
               ),
               const SizedBox(height: 20),
+              TextField(
+                controller: _urlController,
+                decoration: const InputDecoration(
+                  labelText: 'Enter Image URL',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // Load image from the entered URL
+                  _loadNetworkImage(_urlController.text);
+                },
+                child: const Text('Load Network Image'),
+              ),
               ElevatedButton(
                 onPressed: () => _pickImage(ImageSource.gallery),
                 child: const Text('Pick Image from Gallery'),
@@ -155,16 +194,13 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
                 onPressed: () => _pickImage(ImageSource.camera),
                 child: const Text('Take a Photo'),
               ),
-              ElevatedButton(
-                onPressed: () => _loadNetworkImage(_arabicImageUrl),
-                child: const Text('Load Network Arabic Image'),
-              ),
               const SizedBox(height: 20),
               _isProcessing
                   ? const CircularProgressIndicator() // Show loading spinner while processing
                   : Text(
                 _recognizedText,
                 textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 24), // Increased font size
               ),
             ],
           ),
