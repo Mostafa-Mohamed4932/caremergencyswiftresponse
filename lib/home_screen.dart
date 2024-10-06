@@ -5,14 +5,39 @@ class EmergencyHomeScreen extends StatefulWidget {
   _EmergencyHomeScreenState createState() => _EmergencyHomeScreenState();
 }
 
-class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> {
+class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
+
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set up the animation controller and scale animation
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      vsync: this,
+      lowerBound: 0.9,
+      upperBound: 1.0,
+    )..addListener(() {
+      setState(() {});
+    });
+
+    _scaleAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+  }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
     // Add functionality for each tab here
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -57,29 +82,44 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> {
             ),
             SizedBox(height: 40),
             GestureDetector(
-              onTap: () {
-                // Add emergency button functionality here
-                print('Emergency button pressed');
+              onTapDown: (_) {
+                _controller.reverse(); // Shrink the button on press
               },
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    width: 200,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          Colors.red.shade800, // Slightly lighter than before
-                          Colors.red.shade500, // Even lighter red
+              onTapUp: (_) {
+                _controller.forward(); // Return to normal size after press
+                print('Emergency button pressed');
+                // Add any emergency button functionality here
+              },
+              child: Transform.scale(
+                scale: _scaleAnimation.value, // Use the animated scale value
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            Colors.red.shade800, // Slightly darker red
+                            Colors.red.shade500, // Lighter red
+                          ],
+                          stops: [0.6, 1.0],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.red.withOpacity(0.6),
+                            spreadRadius: 5,
+                            blurRadius: 15,
+                            offset: Offset(0, 10), // Shadow below the button
+                          ),
                         ],
-                        stops: [0.6, 1.0], // Adjust for a smooth gradient effect
                       ),
                     ),
-                  ),
-                  Icon(Icons.touch_app, size: 50, color: Colors.white),
-                ],
+                    Icon(Icons.touch_app, size: 50, color: Colors.white),
+                  ],
+                ),
               ),
             ),
           ],
