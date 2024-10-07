@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'login.dart'; // Import the login screen
-import 'home_screen.dart'; // Import the home screen for future navigation
+import 'home_screen.dart'; // Import your Emergency Home Screen
+import 'contact_list.dart'; // Import your Contact List Screen
+import 'medical_history.dart'; // Import your Medical History Screen
+import 'about.dart'; // Import your Settings Screen
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main() {
   runApp(MyApp());
 }
 
@@ -15,87 +16,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginScreen(), // Navigate to Login Screen first
+      home: EmergencyHomeScreen(), // Start with the Emergency Home Screen
       routes: {
-        '/home': (context) => EmergencyHomeScreen(), // Route to EmergencyHomeScreen
+        '/contacts': (context) => ContactListScreen(), // Route to the Contact List
+        '/medical': (context) => MedicalHistoryScreen(), // Route to Medical History
+        '/about': (context) => AboutScreen(), // Route to Settings
       },
-    );
-  }
-}
-
-// Bottom Navigation Bar widget to be accessible from other screens
-class CustomBottomNavBar extends StatefulWidget {
-  final int selectedIndex;
-  final Function(int) onItemTapped;
-
-  CustomBottomNavBar({required this.selectedIndex, required this.onItemTapped});
-
-  @override
-  _CustomBottomNavBarState createState() => _CustomBottomNavBarState();
-}
-
-class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey.shade300, // Add a contrasting color for the nav bar background
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10,
-            spreadRadius: 2,
-            offset: Offset(0, -2), // Shadow above the bottom nav bar
-          ),
-        ],
-      ),
-      child: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: _buildNavBarItem(Icons.home, "Home", widget.selectedIndex == 0),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: _buildNavBarItem(Icons.contacts, "Contacts", widget.selectedIndex == 1),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: _buildNavBarItem(Icons.medical_services, "Medical", widget.selectedIndex == 2),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: _buildNavBarItem(Icons.settings, "Settings", widget.selectedIndex == 3),
-            label: '',
-          ),
-        ],
-        currentIndex: widget.selectedIndex,
-        onTap: widget.onItemTapped,
-        backgroundColor: Colors.transparent, // Transparent to allow container's color to show
-        elevation: 0, // Remove default shadow
-      ),
-    );
-  }
-
-  Widget _buildNavBarItem(IconData icon, String label, bool isSelected) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.red : Colors.transparent,
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Column(
-        children: [
-          Icon(icon, color: isSelected ? Colors.white : Colors.grey),
-          Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: Text(
-              label,
-              style: TextStyle(color: isSelected ? Colors.white : Colors.grey),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

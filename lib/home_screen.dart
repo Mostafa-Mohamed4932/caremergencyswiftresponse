@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'main.dart'; // Import the bottom nav bar
+import 'contact_list.dart'; // Import your Contact List screen
+import 'medical_history.dart'; // Import your Medical History screen
+import 'about.dart'; // Import your Settings screen
 
 class EmergencyHomeScreen extends StatefulWidget {
   @override
@@ -11,6 +13,14 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> with SingleTi
 
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
+
+  // List of screens corresponding to each tab
+  final List<Widget> _screens = [
+    HomeScreen(), // The main emergency screen
+    ContactListScreen(), // Contact list screen
+    MedicalHistoryScreen(), // Medical history screen
+    AboutScreen(), // Settings screen
+  ];
 
   @override
   void initState() {
@@ -29,9 +39,8 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> with SingleTi
 
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      _selectedIndex = index; // Switch between the screens
     });
-    // Add functionality for each tab here
   }
 
   @override
@@ -79,75 +88,7 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> with SingleTi
           ),
         ),
       ),
-      body: Center(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Having an Emergency?',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        'Press the button below, help will arrive soon.',
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
-                      SizedBox(height: 40),
-                      GestureDetector(
-                        onTapDown: (_) {
-                          _controller.reverse();
-                        },
-                        onTapUp: (_) {
-                          _controller.forward();
-                          print('Emergency button pressed');
-                        },
-                        child: Transform.scale(
-                          scale: _scaleAnimation.value,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Container(
-                                width: 200,
-                                height: 200,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: RadialGradient(
-                                    colors: [
-                                      Colors.red.shade800,
-                                      Colors.red.shade500,
-                                    ],
-                                    stops: [0.6, 1.0],
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.red.withOpacity(0.6),
-                                      spreadRadius: 5,
-                                      blurRadius: 15,
-                                      offset: Offset(0, 10),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Icon(Icons.touch_app, size: 50, color: Colors.white),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Spacer(),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
+      body: _screens[_selectedIndex], // Display the selected screen based on the bottom nav item tapped
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
@@ -156,7 +97,79 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> with SingleTi
   }
 }
 
-// CustomBottomNavBar (from main.dart):
+// The original Home Screen with the big red emergency button
+class HomeScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Having an Emergency?',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'Press the button below, help will arrive soon.',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                    SizedBox(height: 40),
+                    GestureDetector(
+                      onTapDown: (_) {
+                        // Handle button press
+                      },
+                      onTapUp: (_) {
+                        // Handle button release
+                      },
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 200,
+                            height: 200,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  Colors.red.shade800,
+                                  Colors.red.shade500,
+                                ],
+                                stops: [0.6, 1.0],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.red.withOpacity(0.6),
+                                  spreadRadius: 5,
+                                  blurRadius: 15,
+                                  offset: Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(Icons.touch_app, size: 50, color: Colors.white),
+                        ],
+                      ),
+                    ),
+                    Spacer(),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// Custom Bottom Navigation Bar component
 class CustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onItemTapped;
@@ -186,8 +199,8 @@ class CustomBottomNavBar extends StatelessWidget {
       icon: Column(
         children: [
           Container(
-            width: 100, // Double the width for more text visibility
-            height: 60, // Adjusted height to fit icon and text
+            width: 100,
+            height: 60,
             decoration: BoxDecoration(
               color: isSelected ? Colors.red : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
@@ -199,7 +212,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 if (isSelected)
                   Text(
                     label,
-                    style: TextStyle(color: Colors.white), // Text inside red box when selected
+                    style: TextStyle(color: Colors.white),
                   ),
               ],
             ),
