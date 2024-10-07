@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'login.dart'; // Import the login page
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -8,56 +7,34 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  // Controllers for input fields
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-
-  // Form key for validation
   final _formKey = GlobalKey<FormState>();
 
-  // Firestore instance
-  final CollectionReference users = FirebaseFirestore.instance.collection('UserInformation');
+  final FirebaseAuth _auth = FirebaseAuth.instance; // Firebase Auth instance
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create an account'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0, // Removes shadow
+        title: Text('Register'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                'Let\'s help you set up your account, it won\'t take long.',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              SizedBox(height: 20),
-
               // Name Input
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
                   labelText: 'Name',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10), // Rounded edges
-                    borderSide: BorderSide(color: Colors.grey), // Border color
-                  ),
-                  enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey), // Color when enabled
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.blue), // Color when focused
                   ),
                 ),
                 validator: (value) {
@@ -68,7 +45,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 },
               ),
               SizedBox(height: 16),
-
               // Email Input
               TextFormField(
                 controller: _emailController,
@@ -76,15 +52,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   labelText: 'Email',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.blue),
                   ),
                 ),
                 keyboardType: TextInputType.emailAddress,
@@ -92,7 +59,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
                   }
-                  // Email validation logic
                   if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
                     return 'Please enter a valid email';
                   }
@@ -100,7 +66,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 },
               ),
               SizedBox(height: 16),
-
               // Password Input
               TextFormField(
                 controller: _passwordController,
@@ -108,15 +73,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   labelText: 'Password',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.blue),
                   ),
                 ),
                 obscureText: true,
@@ -131,7 +87,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 },
               ),
               SizedBox(height: 16),
-
               // Confirm Password Input
               TextFormField(
                 controller: _confirmPasswordController,
@@ -139,15 +94,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   labelText: 'Confirm Password',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.blue),
                   ),
                 ),
                 obscureText: true,
@@ -162,8 +108,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 },
               ),
               SizedBox(height: 24),
-
-              // Sign Up Button (red with white text)
+              // Register Button
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState?.validate() == true) {
@@ -171,11 +116,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white, // Text color is white
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  primary: Colors.red, // Set button color to red
                 ),
-                child: Text('Sign Up'),
+                child: Text('Sign Up', style: TextStyle(color: Colors.white)), // Text color white
               ),
             ],
           ),
@@ -184,47 +127,22 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // Function to register user, check for existing emails, assign missing ID, and save to Firestore
+  // Function to register user using Firebase Authentication
   Future<void> _registerUser() async {
-    final name = _nameController.text;
     final email = _emailController.text;
     final password = _passwordController.text;
 
     try {
-      // Step 1: Check if the email is already in use
-      QuerySnapshot existingEmailSnapshot = await users.where('Email', isEqualTo: email).get();
-      if (existingEmailSnapshot.docs.isNotEmpty) {
-        // Email already exists, show an error message
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('This email is already in use. Please use a different email.'),
-        ));
-        return;
-      }
+      // Try creating the user
+      await _auth.createUserWithEmailAndPassword(email: email, password: password);
 
-      // Step 2: Fetch all IDs to find missing ID
-      QuerySnapshot snapshot = await users.orderBy('ID').get();  // Removed 'ascending: true'
-      int nextId = 1;  // Start with 1
-      for (var doc in snapshot.docs) {
-        if (doc['ID'] == nextId) {
-          nextId++;  // Increment ID if it's taken
-        } else {
-          break;  // We found a missing ID, use this one
-        }
-      }
-
-
-      // Step 3: Save user data to Firestore with the available unique ID
-      await users.add({
-        'ID': nextId,
-        'Name': name,
-        'Email': email,
-        'Password': password,  // Note: Storing plain-text password is not recommended. Use proper authentication and hashing.
-      });
-
-      // Step 4: Show a success message and navigate to login page
+      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('User Registered Successfully! Your ID: $nextId'),
+        content: Text('User Registered Successfully!'),
       ));
+
+      // Navigate to Login Page after success
+      Navigator.pushReplacementNamed(context, '/login'); // <-- Navigation to login.dart
 
       // Clear form fields
       _nameController.clear();
@@ -232,17 +150,19 @@ class _RegisterPageState extends State<RegisterPage> {
       _passwordController.clear();
       _confirmPasswordController.clear();
 
-      // Navigate to the login page after successful registration
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),  // Navigate to "login.dart"
-      );
-
-    } catch (e) {
-      print('Error adding user: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Failed to register user. Please try again.'),
-      ));
+      return; // Return here to prevent the catch block from executing on success
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        // Display an error message if the email is already in use
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('The email is already in use by another account.'),
+        ));
+      } else if (e.code == 'weak-password') {
+        // Handle weak password
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('The password provided is too weak.'),
+        ));
+      }
     }
   }
 
