@@ -116,7 +116,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.red, // Set button color to red
+                  backgroundColor: Colors.red, // Set button color to red
                 ),
                 child: Text('Sign Up', style: TextStyle(color: Colors.white)), // Text color white
               ),
