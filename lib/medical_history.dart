@@ -1,12 +1,11 @@
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class MedicalHistoryScreen extends StatefulWidget {
-  final User user;
+  final User? user; // Accept nullable User
 
-  MedicalHistoryScreen({required this.user});
+  MedicalHistoryScreen({Key? key, required this.user}) : super(key: key);
 
   @override
   _MedicalHistoryScreenState createState() => _MedicalHistoryScreenState();
@@ -24,44 +23,74 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
   @override
   void initState() {
     super.initState();
-    _loadMedicalHistory();
+    if (widget.user != null) {
+      _loadMedicalHistory(); // Load medical history if user is not null
+    }
   }
 
   Future<void> _loadMedicalHistory() async {
-    DocumentSnapshot doc = await FirebaseFirestore.instance
-        .collection('UserInformation')
-        .doc(widget.user.uid)
-        .get();
+    try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('UserInformation')
+          .doc(widget.user!.uid) // Access user UID safely
+          .get();
 
-    if (doc.exists) {
-      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-      setState(() {
-        _heightController.text = data['Height'] ?? '';
-        _weightController.text = data['Weight'] ?? '';
-        _ageController.text = data['Age'] ?? '';
-        _selectedBloodType = data['Blood Type'] ?? 'A+'; // Handle empty blood type
-        _chronicDiseasesController.text = data['Chronic Diseases'] ?? '';
-      });
+      if (doc.exists) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        setState(() {
+          _heightController.text = data['Height'] ?? '';
+          _weightController.text = data['Weight'] ?? '';
+          _ageController.text = data['Age'] ?? '';
+          _selectedBloodType = data['Blood Type'] ?? 'A+'; // Handle empty blood type
+          _chronicDiseasesController.text = data['Chronic Diseases'] ?? '';
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading medical history: $e')),
+      );
     }
   }
 
   Future<void> _saveMedicalHistory() async {
     if (_formKey.currentState?.validate() == true) {
-      await FirebaseFirestore.instance.collection('UserInformation').doc(widget.user.uid).set({
-        'Height': _heightController.text,
-        'Weight': _weightController.text,
-        'Blood Type': _selectedBloodType,
-        'Age': _ageController.text,
-        'Chronic Diseases': _chronicDiseasesController.text,
-      });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Medical history saved successfully.'),
-      ));
+      try {
+        await FirebaseFirestore.instance.collection('UserInformation').doc(widget.user!.uid).set({
+          'Height': _heightController.text,
+          'Weight': _weightController.text,
+          'Blood Type': _selectedBloodType,
+          'Age': _ageController.text,
+          'Chronic Diseases': _chronicDiseasesController.text,
+        });
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Medical history saved successfully.'),
+        ));
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving medical history: $e')),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Check if user is logged in
+    if (widget.user == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Medical History'),
+        ),
+        body: Center(
+          child: Text(
+            'Please log in to access your medical history.',
+            style: TextStyle(fontSize: 18),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Medical History'),
@@ -72,59 +101,40 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
           key: _formKey,
           child: Column(
             children: [
-              // Height - number only
+              // Height
               TextFormField(
                 controller: _heightController,
                 decoration: InputDecoration(labelText: 'Height (cm)'),
-                keyboardType: TextInputType.number, // Allow only numbers
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your height';
-                  }
-                  return null;
-                },
+                keyboardType: TextInputType.number,
+                validator: (value) => value?.isEmpty == true ? 'Please enter your height' : null,
               ),
               SizedBox(height: 16),
 
-              // Weight - number only
+              // Weight
               TextFormField(
                 controller: _weightController,
                 decoration: InputDecoration(labelText: 'Weight (kg)'),
-                keyboardType: TextInputType.number, // Allow only numbers
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your weight';
-                  }
-                  return null;
-                },
+                keyboardType: TextInputType.number,
+                validator: (value) => value?.isEmpty == true ? 'Please enter your weight' : null,
               ),
               SizedBox(height: 16),
 
-              // Age - number only
+              // Age
               TextFormField(
                 controller: _ageController,
                 decoration: InputDecoration(labelText: 'Age'),
-                keyboardType: TextInputType.number, // Allow only numbers
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your age';
-                  }
-                  return null;
-                },
+                keyboardType: TextInputType.number,
+                validator: (value) => value?.isEmpty == true ? 'Please enter your age' : null,
               ),
               SizedBox(height: 16),
 
-              // Blood Type - dropdown menu
+              // Blood Type
               DropdownButtonFormField<String>(
                 value: _selectedBloodType,
                 decoration: InputDecoration(labelText: 'Blood Type'),
                 items: <String>['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
-                    .map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
+                    .map((value) => DropdownMenuItem<String>(value: value, child: Text(value)))
+                    .toList(),
                 onChanged: (newValue) {
                   setState(() {
                     _selectedBloodType = newValue!;
@@ -133,7 +143,7 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
               ),
               SizedBox(height: 16),
 
-              // Chronic Diseases - unchanged
+              // Chronic Diseases
               TextFormField(
                 controller: _chronicDiseasesController,
                 decoration: InputDecoration(labelText: 'Chronic Diseases'),
@@ -151,6 +161,3 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
     );
   }
 }
-
-
-

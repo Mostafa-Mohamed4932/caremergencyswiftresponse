@@ -2,39 +2,32 @@ import 'package:flutter/material.dart';
 import 'contact_list.dart'; // Import your Contact List screen
 import 'medical_history.dart'; // Import your Medical History screen
 import 'about.dart'; // Import your Settings screen
+import 'package:firebase_auth/firebase_auth.dart';
 
 class EmergencyHomeScreen extends StatefulWidget {
+  final User? user; // Make the user parameter nullable
+
+  EmergencyHomeScreen({Key? key, this.user}) : super(key: key); // Pass user as nullable
+
   @override
   _EmergencyHomeScreenState createState() => _EmergencyHomeScreenState();
 }
 
-class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> with SingleTickerProviderStateMixin {
+class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> {
   int _selectedIndex = 0;
 
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
   // List of screens corresponding to each tab
-  final List<Widget> _screens = [
-    HomeScreen(), // The main emergency screen
-    ContactListScreen(), // Contact list screen
-    MedicalHistoryScreen(), // Medical history screen
-    AboutScreen(), // Settings screen
-  ];
+  late final List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 100),
-      vsync: this,
-      lowerBound: 0.9,
-      upperBound: 1.0,
-    )..addListener(() {
-      setState(() {});
-    });
-
-    _scaleAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+    _screens = [
+      HomeScreen(), // The main emergency screen
+      ContactListPage(), // Contact list screen
+      MedicalHistoryScreen(user: widget.user), // Pass user to Medical History
+      AboutScreen(), // Settings screen
+    ];
   }
 
   void _onItemTapped(int index) {
@@ -44,49 +37,10 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> with SingleTi
   }
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70),
-        child: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          flexibleSpace: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            color: Colors.grey.shade200,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Flexible(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Welcome back,', style: TextStyle(fontSize: 16, color: Colors.black54)),
-                      Text('Linda Myers', style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-                CircleAvatar(
-                  backgroundImage: NetworkImage('https://example.com/profile_picture.png'),
-                  onBackgroundImageError: (_, __) {
-                    setState(() {});
-                  },
-                  child: Icon(Icons.person, color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-        ),
+      appBar: AppBar(
+        title: Text('Emergency App'),
       ),
       body: _screens[_selectedIndex], // Display the selected screen based on the bottom nav item tapped
       bottomNavigationBar: CustomBottomNavBar(

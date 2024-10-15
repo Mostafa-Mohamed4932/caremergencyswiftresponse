@@ -115,20 +115,26 @@ class _LoginPageState extends State<LoginPage> {
       // Navigate to MedicalHistoryScreen on successful login
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MedicalHistoryScreen(user: userCredential.user!)),
+        MaterialPageRoute(
+          builder: (context) => MedicalHistoryScreen(user: userCredential.user!),
+        ),
       );
     } catch (e) {
       String errorMessage;
 
-      switch (e.code) {
-        case 'user-not-found':
-          errorMessage = 'No user found for this email.';
-          break;
-        case 'wrong-password':
-          errorMessage = 'Wrong password provided.';
-          break;
-        default:
-          errorMessage = 'Login failed. Please try again.';
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'user-not-found':
+            errorMessage = 'No user found for this email.';
+            break;
+          case 'wrong-password':
+            errorMessage = 'Wrong password provided.';
+            break;
+          default:
+            errorMessage = 'Login failed. Please try again.';
+        }
+      } else {
+        errorMessage = 'Login failed. Please try again.';
       }
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -143,8 +149,4 @@ class _LoginPageState extends State<LoginPage> {
     _passwordController.dispose();
     super.dispose();
   }
-}
-
-extension on Object {
-  get code => null;
 }

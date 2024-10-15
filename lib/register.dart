@@ -142,7 +142,7 @@ class _RegisterPageState extends State<RegisterPage> {
       ));
 
       // Navigate to Login Page after success
-      Navigator.pushReplacementNamed(context, '/login'); // <-- Navigation to login.dart
+      Navigator.pushReplacementNamed(context, '/login'); // Navigate to login page
 
       // Clear form fields
       _nameController.clear();
@@ -150,7 +150,6 @@ class _RegisterPageState extends State<RegisterPage> {
       _passwordController.clear();
       _confirmPasswordController.clear();
 
-      return; // Return here to prevent the catch block from executing on success
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
         // Display an error message if the email is already in use
