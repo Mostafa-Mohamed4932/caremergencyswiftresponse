@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'register.dart';
-import 'medical_history.dart'; // Import the MedicalHistoryScreen
+import 'home_screen.dart'; // Import the Home Screen
 
 class LoginPage extends StatefulWidget {
   @override
@@ -112,11 +112,11 @@ class _LoginPageState extends State<LoginPage> {
         password: password,
       );
 
-      // Navigate to MedicalHistoryScreen on successful login
+      // Navigate to HomeScreen after successful login
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => MedicalHistoryScreen(user: userCredential.user!),
+          builder: (context) => EmergencyHomeScreen(user: userCredential.user),
         ),
       );
     } catch (e) {

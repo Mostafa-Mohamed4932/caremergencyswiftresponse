@@ -65,6 +65,9 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Medical history saved successfully.'),
         ));
+
+        // Navigate back to the home screen after saving medical history
+        Navigator.pushReplacementNamed(context, '/home');
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error saving medical history: $e')),

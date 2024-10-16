@@ -141,15 +141,14 @@ class _RegisterPageState extends State<RegisterPage> {
         content: Text('User Registered Successfully!'),
       ));
 
-      // Navigate to Login Page after success
-      Navigator.pushReplacementNamed(context, '/login'); // Navigate to login page
+      // Navigate to Home Screen after success
+      Navigator.pushReplacementNamed(context, '/home'); // Navigate to home screen
 
       // Clear form fields
       _nameController.clear();
       _emailController.clear();
       _passwordController.clear();
       _confirmPasswordController.clear();
-
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
         // Display an error message if the email is already in use
