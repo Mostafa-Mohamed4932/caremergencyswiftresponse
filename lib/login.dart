@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'register.dart';
-import 'medical_history.dart'; // Import the MedicalHistoryScreen
+import 'home_screen.dart'; // Import the Home Screen
 
 class LoginPage extends StatefulWidget {
   @override
@@ -112,23 +112,29 @@ class _LoginPageState extends State<LoginPage> {
         password: password,
       );
 
-      // Navigate to MedicalHistoryScreen on successful login
+      // Navigate to HomeScreen after successful login
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MedicalHistoryScreen(user: userCredential.user!)),
+        MaterialPageRoute(
+          builder: (context) => EmergencyHomeScreen(user: userCredential.user),
+        ),
       );
     } catch (e) {
       String errorMessage;
 
-      switch (e.code) {
-        case 'user-not-found':
-          errorMessage = 'No user found for this email.';
-          break;
-        case 'wrong-password':
-          errorMessage = 'Wrong password provided.';
-          break;
-        default:
-          errorMessage = 'Login failed. Please try again.';
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'user-not-found':
+            errorMessage = 'No user found for this email.';
+            break;
+          case 'wrong-password':
+            errorMessage = 'Wrong password provided.';
+            break;
+          default:
+            errorMessage = 'Login failed. Please try again.';
+        }
+      } else {
+        errorMessage = 'Login failed. Please try again.';
       }
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -143,8 +149,4 @@ class _LoginPageState extends State<LoginPage> {
     _passwordController.dispose();
     super.dispose();
   }
-}
-
-extension on Object {
-  get code => null;
 }

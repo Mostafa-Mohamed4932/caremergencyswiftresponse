@@ -21,15 +21,18 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+// Specify the Kotlin version here
+ext.kotlin_version = '1.8.0' // Update this to the latest version
+
 apply plugin: 'com.android.application'
-// START: FlutterFire Configuration
+// FlutterFire configuration
 apply plugin: 'com.google.gms.google-services'
-// END: FlutterFire Configuration
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    compileSdkVersion flutter.compileSdkVersion
+    // Set explicit SDK versions
+    compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -46,21 +49,20 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.example.caremergencyswiftresponse"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
+        // Set explicit minimum and target SDK versions
+        minSdkVersion 21
+        targetSdkVersion 34 // Update this to SDK 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so flutter run --release works.
-            signingConfig signingConfigs.debug
+            // Use proper signing configuration for release
+            signingConfig signingConfigs.debug // Replace with your release signing config
+            minifyEnabled false
+            shrinkResources false
         }
     }
 }
@@ -71,4 +73,5 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // Other dependencies can be added here as needed
 }

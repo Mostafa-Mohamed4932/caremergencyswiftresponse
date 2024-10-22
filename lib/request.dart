@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
-class AboutScreen extends StatelessWidget {
+
+
+class RequestScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('About / Settings'),
+        title: Text('Requests'),
       ),
       body: Center(
-        child: Text('About / Settings Page'),
+        child: Text('Requests'),
       ),
     );
   }

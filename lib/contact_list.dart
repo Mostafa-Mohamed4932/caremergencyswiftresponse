@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -11,6 +10,7 @@ class ContactListPage extends StatefulWidget {
 
 class _ContactListPageState extends State<ContactListPage> {
   List<Contact> contacts = [];
+  bool isLoading = true; // Loading state
 
   @override
   void initState() {
@@ -34,6 +34,9 @@ class _ContactListPageState extends State<ContactListPage> {
             content: Text('Contact permission denied'),
           ),
         );
+        setState(() {
+          isLoading = false; // Update loading state
+        });
       }
     }
   }
@@ -44,9 +47,17 @@ class _ContactListPageState extends State<ContactListPage> {
       Iterable<Contact> contactsFromPhone = await ContactsService.getContacts();
       setState(() {
         contacts = contactsFromPhone.toList();
+        isLoading = false; // Update loading state
       });
     } catch (e) {
-      print("Error fetching contacts: $e");
+      setState(() {
+        isLoading = false; // Update loading state
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error fetching contacts: $e'),
+        ),
+      );
     }
   }
 
@@ -70,8 +81,10 @@ class _ContactListPageState extends State<ContactListPage> {
       appBar: AppBar(
         title: Text('Contacts'),
       ),
-      body: contacts.isEmpty
-          ? Center(child: CircularProgressIndicator())
+      body: isLoading
+          ? Center(child: CircularProgressIndicator()) // Show loading indicator
+          : contacts.isEmpty
+          ? Center(child: Text('No contacts found')) // Handle empty contacts
           : ListView.builder(
         itemCount: contacts.length,
         itemBuilder: (context, index) {
@@ -103,4 +116,3 @@ class _ContactListPageState extends State<ContactListPage> {
     );
   }
 }
-
