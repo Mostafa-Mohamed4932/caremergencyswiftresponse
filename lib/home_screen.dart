@@ -3,6 +3,8 @@ import 'contact_list.dart'; // Import your Contact List screen
 import 'medical_history.dart'; // Import your Medical History screen
 import 'about.dart'; // Import your Settings screen
 import 'package:firebase_auth/firebase_auth.dart';
+import 'request.dart'; // Import your Request Screen
+import 'double_parking.dart'; // Import your Double Parking screen
 
 class EmergencyHomeScreen extends StatefulWidget {
   final User? user; // Make the user parameter nullable
@@ -51,7 +53,7 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> {
   }
 }
 
-// The original Home Screen with the big red emergency button
+// The Home Screen with the big red emergency button and an additional button for double parking
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -76,11 +78,12 @@ class HomeScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 40),
                     GestureDetector(
-                      onTapDown: (_) {
-                        // Handle button press
-                      },
-                      onTapUp: (_) {
-                        // Handle button release
+                      onTap: () {
+                        // Navigate to RequestScreen when the button is pressed
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => RequestScreen()),
+                        );
                       },
                       child: Stack(
                         alignment: Alignment.center,
@@ -109,6 +112,23 @@ class HomeScreen extends StatelessWidget {
                           ),
                           Icon(Icons.touch_app, size: 50, color: Colors.white),
                         ],
+                      ),
+                    ),
+                    SizedBox(height: 20), // Space between buttons
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        // Navigate to DoubleParkingScreen when the button is pressed
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => DoubleParkingScreen()),
+                        );
+                      },
+                      icon: Icon(Icons.local_parking), // Icon for the button
+                      label: Text('Report Double Parking'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue, // Button background color
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                        textStyle: TextStyle(fontSize: 16),
                       ),
                     ),
                     Spacer(),
@@ -177,3 +197,6 @@ class CustomBottomNavBar extends StatelessWidget {
     );
   }
 }
+
+
+

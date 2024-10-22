@@ -5,7 +5,10 @@ import 'login.dart'; // Import your Login Page
 import 'contact_list.dart'; // Import your Contact List Screen
 import 'medical_history.dart'; // Import your Medical History Screen
 import 'about.dart'; // Import your About Screen
+import 'request.dart'; // Import your Request Screen
 import 'package:firebase_auth/firebase_auth.dart';
+import 'double_parking.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure widget binding is initialized
@@ -27,6 +30,8 @@ class MyApp extends StatelessWidget {
         '/medical': (context) => MedicalHistoryScreen(user: FirebaseAuth.instance.currentUser!), // Route to Medical History
         '/about': (context) => AboutScreen(), // Route to About
         '/home': (context) => EmergencyHomeScreen(user: FirebaseAuth.instance.currentUser), // Route to Home Screen
+        '/request': (context) => RequestScreen(), // Route to Request Screen
+        '/double_parking': (context) => DoubleParkingScreen(), // Route to Double Parking Screen
       },
     );
   }
