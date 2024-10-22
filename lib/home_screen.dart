@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'contact_list.dart'; // Import your Contact List screen
 import 'medical_history.dart'; // Import your Medical History screen
-import 'about.dart'; // Import your Settings screen
+import 'Alert.dart'; // Import your Alert screen
+import 'settings.dart'; // Import your Settings page
 import 'package:firebase_auth/firebase_auth.dart';
 import 'request.dart'; // Import your Request Screen
 import 'double_parking.dart'; // Import your Double Parking screen
@@ -28,7 +29,7 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> {
       HomeScreen(), // The main emergency screen
       ContactListPage(), // Contact list screen
       MedicalHistoryScreen(user: widget.user), // Pass user to Medical History
-      AboutScreen(), // Settings screen
+      AlertScreen(), // Alert screen
     ];
   }
 
@@ -43,6 +44,17 @@ class _EmergencyHomeScreenState extends State<EmergencyHomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Emergency App'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings), // Settings icon
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingScreen()), // Navigate to the Settings page
+              );
+            },
+          ),
+        ],
       ),
       body: _screens[_selectedIndex], // Display the selected screen based on the bottom nav item tapped
       bottomNavigationBar: CustomBottomNavBar(
@@ -160,7 +172,7 @@ class CustomBottomNavBar extends StatelessWidget {
         _buildNavBarItem(Icons.home, "Home", selectedIndex == 0),
         _buildNavBarItem(Icons.contacts, "Contacts", selectedIndex == 1),
         _buildNavBarItem(Icons.medical_services, "Medical History", selectedIndex == 2),
-        _buildNavBarItem(Icons.settings, "Settings", selectedIndex == 3),
+        _buildNavBarItem(Icons.warning, "Alerts", selectedIndex == 3),
       ],
       currentIndex: selectedIndex,
       onTap: onItemTapped,
@@ -197,6 +209,3 @@ class CustomBottomNavBar extends StatelessWidget {
     );
   }
 }
-
-
-
